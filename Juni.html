@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Juni Lohnabrechnung</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#3f4b5d;
+    padding:20px;
+}
+
+.topbar{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+}
+
+.btn{
+
+    padding:10px 20px;
+
+    border:none;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    color:white;
+
+    background:
+    linear-gradient(#4da3ff,#005fcc);
+
+    box-shadow:
+    inset 0 2px 2px rgba(255,255,255,0.4),
+    0 4px 0 #003f88,
+    0 7px 10px rgba(0,0,0,0.4);
+
+}
+
+.btn:active{
+
+    transform:translateY(3px);
+
+    box-shadow:
+    inset 0 2px 2px rgba(255,255,255,0.4),
+    0 1px 0 #003f88;
+
+}
+
+.sheet{
+
+    background:#425062;
+
+    padding:20px;
+
+    border-radius:15px;
+
+    overflow:auto;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:white;
+
+    color:black;
+
+}
+
+th{
+
+    background:#f2f2f2;
+
+    border:1px solid #555;
+
+    padding:10px;
+
+    font-size:28px;
+
+}
+
+td{
+
+    border:1px solid #555;
+
+    padding:6px;
+
+    font-size:16px;
+
+}
+
+.center{
+    text-align:center;
+}
+
+.bold{
+    font-weight:bold;
+}
+
+.netto{
+
+    margin-top:20px;
+
+    background:white;
+
+    padding:15px;
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    text-align:right;
+
+    border:2px solid black;
+
+}
+
+.manualInput{
+
+    width:70px;
+
+    padding:4px;
+
+    border:1px solid #555;
+
+    border-radius:5px;
+
+}
+
+@media(max-width:900px){
+
+    th{
+        font-size:20px;
+    }
+
+    td{
+        font-size:13px;
+    }
+
+    .netto{
+        font-size:24px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+
+<button class="btn"
+onclick="location.href='index.html'">
+
+Zum Kalender
+
+</button>
+
+<button class="btn"
+onclick="calculateJune()">
+
+Neu berechnen
+
+</button>
+
+</div>
+
+<div class="sheet">
+
+<table>
+
+<tr>
+<th>Lohnart</th>
+<th>Tage</th>
+<th>bez. Std.</th>
+<th>%</th>
+<th>Lohnsatz</th>
+<th>Betrag</th>
+</tr>
+
+<tr>
+<td>Normallohn</td>
+<td id="normaltage"></td>
+<td id="normalstunden"></td>
+<td></td>
+<td id="stundenlohn1"></td>
+<td id="normallohn"></td>
+</tr>
+
+<tr>
+<td>Urlaubslohn</td>
+<td id="urlaubtage"></td>
+<td id="urlaubstunden"></td>
+<td></td>
+<td id="stundenlohn2"></td>
+<td id="urlaubslohn"></td>
+</tr>
+
+<tr>
+<td>Nachtzuschlag</td>
+<td></td>
+<td id="nachtstunden"></td>
+<td class="center">5%</td>
+<td id="nachtlohn"></td>
+<td id="nachtbetrag"></td>
+</tr>
+
+<tr>
+<td>Sonntagszuschlag</td>
+<td></td>
+<td id="sonntagstunden"></td>
+<td class="center">30%</td>
+<td id="sonntaglohn"></td>
+<td id="sonntagbetrag"></td>
+</tr>
+
+<tr>
+
+<td>Feiertagszuschlag</td>
+
+<td></td>
+
+<td>
+
+<div style="display:flex;gap:5px;align-items:center;">
+
+<span id="feiertagstunden"></span>
+
+<input
+type="number"
+id="manualFeiertag"
+value="0"
+class="manualInput"
+oninput="calculateJune()">
+
+</div>
+
+</td>
+
+<td class="center">100%</td>
+
+<td id="feiertaglohn"></td>
+
+<td id="feiertagbetrag"></td>
+
+</tr>
+
+<tr>
+<td>Werkzulage</td>
+<td></td>
+<td id="werkstunden"></td>
+<td></td>
+<td>2,67 €</td>
+<td id="werkbetrag"></td>
+</tr>
+
+<tr>
+<td>HFL Zulage</td>
+<td></td>
+<td id="hflstunden"></td>
+<td></td>
+<td>0,20 €</td>
+<td id="hflbetrag"></td>
+</tr>
+
+<tr>
+<td>Leitstellenzulage</td>
+<td></td>
+<td id="lststunden"></td>
+<td></td>
+<td>1,00 €</td>
+<td id="lstbetrag"></td>
+</tr>
+
+<tr>
+<td>Krank</td>
+<td id="kranktage"></td>
+<td id="krankstunden"></td>
+<td></td>
+<td id="stundenlohn3"></td>
+<td id="krankbetrag"></td>
+</tr>
+
+<tr>
+<td colspan="5" class="bold">
+Gesamt Brutto
+</td>
+<td id="gesamtbrutto" class="bold"></td>
+</tr>
+
+<tr>
+<td colspan="4">
+Lohnsteuer
+</td>
+<td class="center">
+16,55%
+</td>
+<td id="steuer"></td>
+</tr>
+
+<tr>
+<td colspan="4">
+Krankenversicherung
+</td>
+<td class="center">
+8,80%
+</td>
+<td id="kv"></td>
+</tr>
+
+<tr>
+<td colspan="4">
+Rentenversicherung
+</td>
+<td class="center">
+9,30%
+</td>
+<td id="rv"></td>
+</tr>
+
+<tr>
+<td colspan="4">
+Pflegeversicherung
+</td>
+<td class="center">
+1,55%
+</td>
+<td id="pv"></td>
+</tr>
+
+<tr>
+<td colspan="4">
+Arbeitslosenversicherung
+</td>
+<td class="center">
+1,30%
+</td>
+<td id="av"></td>
+</tr>
+
+</table>
+
+<div class="netto">
+
+Netto Auszahlung:
+<span id="netto"></span>
+
+</div>
+
+</div>
+
+<script>
+
+const stundenlohn = 14.73;
+const werkzulage = 2.67;
+const lstzulage = 1.00;
+
+function euro(v){
+
+    return v.toFixed(2).replace(".",",") + " €";
+
+}
+
+function getJuneHolidays(){
+
+    return [];
+
+}
+
+function loadCalendarData(){
+
+    return JSON.parse(
+        localStorage.getItem(
+            "schichtplan_data"
+        )
+    ) || [];
+
+}
+
+function calculateJune(){
+
+    const data =
+    loadCalendarData();
+
+    let normaltage = 0;
+    let normalstunden = 0;
+
+    let urlaubtage = 0;
+    let urlaubstunden = 0;
+
+    let kranktage = 0;
+    let krankstunden = 0;
+
+    let nachtstunden = 0;
+    let sonntagstunden = 0;
+    let feiertagstunden = 0;
+
+    let werkstunden = 0;
+    let lststunden = 0;
+    let hflstunden = 0;
+
+    data.forEach(entry=>{
+
+        const shift =
+        entry.html;
+
+        const shiftText =
+        shift
+        .replace(/<[^>]*>/g,"")
+        .trim();
+
+        const date =
+        new Date(entry.date);
+
+        const dateString =
+        entry.date;
+
+        const weekday =
+        date.getDay();
+
+        const isSunday =
+        weekday === 0;
+
+        const isHoliday =
+        getJuneHolidays()
+        .includes(dateString);
+
+        if(
+            dateString.startsWith("2026-06")
+            &&
+            shiftText === "U"
+        ){
+
+            urlaubtage += 1;
+            urlaubstunden += 24;
+
+        }
+
+        if(
+            dateString.startsWith("2026-06")
+            &&
+            shiftText === "K"
+        ){
+
+            kranktage += 1;
+            krankstunden += 24;
+
+        }
+
+        if(
+            shiftText.includes("24h")
+            ||
+            shiftText.includes("LST")
+        ){
+
+            if(
+                dateString.startsWith("2026-06")
+            ){
+
+                normaltage++;
+
+                normalstunden += 24;
+
+                nachtstunden += 8;
+
+                werkstunden += 24;
+
+                if(
+                    shiftText.includes("LST")
+                ){
+
+                    lststunden += 24;
+
+                }
+
+                if(isSunday){
+
+                    sonntagstunden += 17;
+
+                }
+
+                if(isHoliday){
+
+                    feiertagstunden += 17;
+
+                }
+
+            }
+
+            const nextDay =
+            new Date(date);
+
+            nextDay.setDate(
+                nextDay.getDate()+1
+            );
+
+            const nextDayString =
+            nextDay
+            .toISOString()
+            .split("T")[0];
+
+            if(
+                nextDayString.startsWith("2026-06")
+                &&
+                nextDay.getDay() === 0
+            ){
+
+                sonntagstunden += 7;
+
+            }
+
+            if(
+                nextDayString.startsWith("2026-06")
+                &&
+                getJuneHolidays()
+                .includes(nextDayString)
+            ){
+
+                feiertagstunden += 7;
+
+            }
+
+        }
+
+        if(
+            shiftText.includes("12h Tag")
+            &&
+            dateString.startsWith("2026-06")
+        ){
+
+            normaltage++;
+
+            normalstunden += 12;
+
+            werkstunden += 12;
+
+            if(isSunday){
+
+                sonntagstunden += 12;
+
+            }
+
+            if(isHoliday){
+
+                feiertagstunden += 12;
+
+            }
+
+        }
+
+        if(
+            shiftText.includes("12h Nacht")
+            &&
+            dateString.startsWith("2026-06")
+        ){
+
+            normaltage++;
+
+            normalstunden += 12;
+
+            nachtstunden += 8;
+
+            werkstunden += 12;
+
+            if(isSunday){
+
+                sonntagstunden += 12;
+
+            }
+
+            if(isHoliday){
+
+                feiertagstunden += 12;
+
+            }
+
+        }
+
+        if(
+            shiftText.includes("HFL")
+        ){
+
+            hflstunden += 24;
+
+        }
+
+    });
+
+    const manualFeiertag =
+    parseFloat(
+        document.getElementById(
+            "manualFeiertag"
+        ).value
+    ) || 0;
+
+    feiertagstunden += manualFeiertag;
+
+    const normallohn =
+    normalstunden *
+    stundenlohn;
+
+    const urlaubslohn =
+    urlaubstunden *
+    stundenlohn;
+
+    const krankbetrag =
+    krankstunden *
+    stundenlohn;
+
+    const nachtbetrag =
+    nachtstunden *
+    (
+        stundenlohn * 0.05
+    );
+
+    const sonntagbetrag =
+    sonntagstunden *
+    (
+        stundenlohn * 0.30
+    );
+
+    const feiertagbetrag =
+    feiertagstunden *
+    (
+        stundenlohn * 1.00
+    );
+
+    const werkbetrag =
+    werkstunden *
+    werkzulage;
+
+    const lstbetrag =
+    lststunden *
+    lstzulage;
+
+    const hflbetrag =
+    hflstunden *
+    0.20;
+
+    const brutto =
+
+    normallohn +
+    urlaubslohn +
+    krankbetrag +
+    nachtbetrag +
+    sonntagbetrag +
+    feiertagbetrag +
+    werkbetrag +
+    lstbetrag +
+    hflbetrag;
+
+    const steuer =
+    brutto * 0.1655;
+
+    const kv =
+    brutto * 0.088;
+
+    const rv =
+    brutto * 0.093;
+
+    const pv =
+    brutto * 0.0155;
+
+    const av =
+    brutto * 0.013;
+
+    const netto =
+
+    brutto -
+    steuer -
+    kv -
+    rv -
+    pv -
+    av;
+
+    document.getElementById(
+        "normaltage"
+    ).innerText = normaltage;
+
+    document.getElementById(
+        "normalstunden"
+    ).innerText = normalstunden;
+
+    document.getElementById(
+        "urlaubtage"
+    ).innerText = urlaubtage;
+
+    document.getElementById(
+        "urlaubstunden"
+    ).innerText = urlaubstunden;
+
+    document.getElementById(
+        "kranktage"
+    ).innerText = kranktage;
+
+    document.getElementById(
+        "krankstunden"
+    ).innerText = krankstunden;
+
+    document.getElementById(
+        "nachtstunden"
+    ).innerText = nachtstunden;
+
+    document.getElementById(
+        "sonntagstunden"
+    ).innerText = sonntagstunden;
+
+    document.getElementById(
+        "feiertagstunden"
+    ).innerText = feiertagstunden;
+
+    document.getElementById(
+        "werkstunden"
+    ).innerText = werkstunden;
+
+    document.getElementById(
+        "lststunden"
+    ).innerText = lststunden;
+
+    document.getElementById(
+        "hflstunden"
+    ).innerText = hflstunden;
+
+    document.getElementById(
+        "stundenlohn1"
+    ).innerText = euro(stundenlohn);
+
+    document.getElementById(
+        "stundenlohn2"
+    ).innerText = euro(stundenlohn);
+
+    document.getElementById(
+        "stundenlohn3"
+    ).innerText = euro(stundenlohn);
+
+    document.getElementById(
+        "nachtlohn"
+    ).innerText =
+    euro(stundenlohn * 0.05);
+
+    document.getElementById(
+        "sonntaglohn"
+    ).innerText =
+    euro(stundenlohn * 0.30);
+
+    document.getElementById(
+        "feiertaglohn"
+    ).innerText =
+    euro(stundenlohn);
+
+    document.getElementById(
+        "normallohn"
+    ).innerText =
+    euro(normallohn);
+
+    document.getElementById(
+        "urlaubslohn"
+    ).innerText =
+    euro(urlaubslohn);
+
+    document.getElementById(
+        "nachtbetrag"
+    ).innerText =
+    euro(nachtbetrag);
+
+    document.getElementById(
+        "sonntagbetrag"
+    ).innerText =
+    euro(sonntagbetrag);
+
+    document.getElementById(
+        "feiertagbetrag"
+    ).innerText =
+    euro(feiertagbetrag);
+
+    document.getElementById(
+        "werkbetrag"
+    ).innerText =
+    euro(werkbetrag);
+
+    document.getElementById(
+        "lstbetrag"
+    ).innerText =
+    euro(lstbetrag);
+
+    document.getElementById(
+        "hflbetrag"
+    ).innerText =
+    euro(hflbetrag);
+
+    document.getElementById(
+        "krankbetrag"
+    ).innerText =
+    euro(krankbetrag);
+
+    document.getElementById(
+        "gesamtbrutto"
+    ).innerText =
+    euro(brutto);
+
+    document.getElementById(
+        "steuer"
+    ).innerText =
+    "-" + euro(steuer);
+
+    document.getElementById(
+        "kv"
+    ).innerText =
+    "-" + euro(kv);
+
+    document.getElementById(
+        "rv"
+    ).innerText =
+    "-" + euro(rv);
+
+    document.getElementById(
+        "pv"
+    ).innerText =
+    "-" + euro(pv);
+
+    document.getElementById(
+        "av"
+    ).innerText =
+    "-" + euro(av);
+
+    document.getElementById(
+        "netto"
+    ).innerText =
+    euro(netto);
+
+}
+
+calculateJune();
+
+</script>
+
+</body>
+</html>

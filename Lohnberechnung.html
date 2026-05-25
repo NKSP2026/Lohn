@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Schichtplan Sachsen</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#3a3a3a;
+    color:white;
+    padding:10px;
+}
+
+/* =========================
+HEADER
+========================= */
+
+.yearbox{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+input{
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+}
+
+/* =========================
+BUTTONS
+========================= */
+
+.topbar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.btn{
+
+    border:none;
+    border-radius:12px;
+
+    padding:12px 18px;
+
+    color:white;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    min-width:110px;
+
+    box-shadow:
+    inset 0 2px 2px rgba(255,255,255,0.4),
+    0 5px 0 rgba(0,0,0,0.5),
+    0 6px 10px rgba(0,0,0,0.6);
+
+    transition:all 0.1s;
+
+}
+
+.btn:active{
+
+    transform:translateY(4px);
+
+    box-shadow:
+    inset 0 2px 2px rgba(255,255,255,0.4),
+    0 1px 0 rgba(0,0,0,0.5);
+
+}
+
+.b24{background:linear-gradient(#ffcc33,#b06a00);}
+.b12t{background:linear-gradient(#4d6dff,#0022aa);}
+.b12n{background:linear-gradient(#ff4444,#990000);}
+.blst{background:linear-gradient(#ff66ff,#b000b0);}
+.bu{background:linear-gradient(#44ff44,#008800);}
+.buu{background:linear-gradient(#00dd88,#006644);}
+.bl{background:linear-gradient(#ffb347,#cc6d00);}
+.bk{background:linear-gradient(#ff3333,#aa0000);}
+.bbrw{background:linear-gradient(#9d8cff,#5b3fd1);}
+.bbrw24{background:linear-gradient(#ffe066,#d89000);}
+.bremove{background:linear-gradient(#44bbff,#0066aa);}
+
+/* =========================
+CALENDAR
+========================= */
+
+.calendar{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.month{
+    background:#555;
+    border-radius:15px;
+    padding:10px;
+    overflow:auto;
+}
+
+.month-title{
+    font-size:30px;
+    margin-bottom:10px;
+    font-weight:bold;
+}
+
+.days{
+    display:grid;
+    grid-template-columns:100px repeat(31,minmax(50px,1fr));
+}
+
+/* =========================
+CELLS
+========================= */
+
+.cell{
+
+    border:1px solid #888;
+
+    min-height:70px;
+
+    background:#efefef;
+
+    color:black;
+
+    position:relative;
+
+    overflow:hidden;
+
+    cursor:pointer;
+
+}
+
+.label{
+    background:#d7d7d7;
+    font-weight:bold;
+    padding:5px;
+}
+
+.day-header{
+    text-align:center;
+    background:#f7f7f7;
+    font-size:12px;
+    cursor:default;
+}
+
+.day-number{
+    font-size:15px;
+    font-weight:bold;
+}
+
+/* =========================
+SONNTAG
+========================= */
+
+.sunday{
+    background:#ffd7b3 !important;
+}
+
+/* =========================
+FEIERTAG
+========================= */
+
+.holiday{
+    background:#ff9c9c !important;
+}
+
+/* =========================
+SCHICHT
+========================= */
+
+.shift{
+
+    margin-top:5px;
+
+    border-radius:5px;
+
+    padding:3px;
+
+    color:white;
+
+    text-align:center;
+
+    font-size:12px;
+
+    font-weight:bold;
+
+}
+
+/* =========================
+FERIEN
+========================= */
+
+.ferien-sachsen{
+
+    position:absolute;
+
+    bottom:0;
+    left:0;
+
+    width:50%;
+    height:7px;
+
+    background:#22cc00;
+
+}
+
+.ferien-brandenburg{
+
+    position:absolute;
+
+    bottom:0;
+    right:0;
+
+    width:50%;
+    height:7px;
+
+    background:#ffd500;
+
+}
+
+/* =========================
+BOTTOM NAV
+========================= */
+
+.month-nav{
+
+    position:sticky;
+
+    bottom:0;
+
+    background:#222;
+
+    padding:10px;
+
+    margin-top:30px;
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    border-top:3px solid #555;
+
+}
+
+.month-link{
+
+    background:#444;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:10px 15px;
+
+    border-radius:10px;
+
+    font-weight:bold;
+
+}
+
+/* =========================
+RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+
+    .days{
+        grid-template-columns:70px repeat(31,55px);
+    }
+
+    .month-title{
+        font-size:24px;
+    }
+
+    .btn{
+        min-width:90px;
+        font-size:12px;
+        padding:10px;
+    }
+
+}
+
+@media(max-width:600px){
+
+    .days{
+        grid-template-columns:60px repeat(31,50px);
+    }
+
+    .cell{
+        min-height:60px;
+    }
+
+    .month-title{
+        font-size:20px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="yearbox">
+
+<h1>Schichtplan Sachsen</h1>
+
+<input type="number" id="yearInput" value="2026">
+
+<button class="btn" onclick="generateCalendar()">
+Kalender erzeugen
+</button>
+
+</div>
+
+<div class="topbar">
+
+<button class="btn b24" onclick="setCurrentShift('24h')">24h</button>
+
+<button class="btn b12t" onclick="setCurrentShift('12h Tag')">12h Tag</button>
+
+<button class="btn b12n" onclick="setCurrentShift('12h Nacht')">12h Nacht</button>
+
+<button class="btn blst" onclick="setCurrentShift('LST')">LST</button>
+
+<button class="btn bu" onclick="setCurrentShift('U')">U</button>
+
+<button class="btn buu" onclick="setCurrentShift('UU')">UU</button>
+
+<button class="btn bl" onclick="setCurrentShift('L')">L</button>
+
+<button class="btn bk" onclick="setCurrentShift('K')">K</button>
+
+<button class="btn bbrw" onclick="setCurrentShift('BrW')">BrW</button>
+
+<button class="btn bbrw24" onclick="setCurrentShift('BrW/24h')">BrW/24h</button>
+
+<button class="btn bremove" onclick="setCurrentShift('ENTFERNEN')">Entfernen</button>
+
+</div>
+
+<div class="calendar" id="calendar"></div>
+
+<script>
+
+/* =========================
+CURRENT SHIFT
+========================= */
+
+let currentShift = "24h";
+
+function setCurrentShift(type){
+
+    currentShift = type;
+
+}
+
+/* =========================
+MONTHS
+========================= */
+
+const monate = [
+
+"Januar",
+"Februar",
+"März",
+"April",
+"Mai",
+"Juni",
+"Juli",
+"August",
+"September",
+"Oktober",
+"November",
+"Dezember"
+
+];
+
+const wochentage = [
+"So","Mo","Di","Mi","Do","Fr","Sa"
+];
+
+/* =========================
+DATE FORMAT
+========================= */
+
+function formatDate(date){
+
+    const y = date.getFullYear();
+
+    const m =
+    String(date.getMonth()+1)
+    .padStart(2,"0");
+
+    const d =
+    String(date.getDate())
+    .padStart(2,"0");
+
+    return `${y}-${m}-${d}`;
+
+}
+
+/* =========================
+LOCAL DATE
+========================= */
+
+function parseLocalDate(str){
+
+    const parts = str.split("-");
+
+    return new Date(
+        parseInt(parts[0]),
+        parseInt(parts[1])-1,
+        parseInt(parts[2]),
+        12,0,0
+    );
+
+}
+
+/* =========================
+EASTER
+========================= */
+
+function getEaster(year){
+
+    let f = Math.floor,
+    G = year % 19,
+    C = f(year / 100),
+    H = (
+        C -
+        f(C / 4) -
+        f((8 * C + 13) / 25) +
+        19 * G +
+        15
+    ) % 30,
+
+    I = H -
+    f(H / 28) *
+    (
+        1 -
+        f(29 / (H + 1)) *
+        f((21 - G) / 11)
+    ),
+
+    J = (
+        year +
+        f(year / 4) +
+        I +
+        2 -
+        C +
+        f(C / 4)
+    ) % 7,
+
+    L = I - J,
+
+    month = 3 + f((L + 40) / 44),
+
+    day = L + 28 - 31 * f(month / 4);
+
+    return new Date(year,month-1,day,12,0,0);
+
+}
+
+/* =========================
+HOLIDAYS
+========================= */
+
+function getHolidays(year){
+
+    const easter = getEaster(year);
+
+    const karfreitag =
+    new Date(easter);
+
+    karfreitag.setDate(
+        easter.getDate()-2
+    );
+
+    const ostermontag =
+    new Date(easter);
+
+    ostermontag.setDate(
+        easter.getDate()+1
+    );
+
+    const himmelfahrt =
+    new Date(easter);
+
+    himmelfahrt.setDate(
+        easter.getDate()+39
+    );
+
+    const pfingstmontag =
+    new Date(easter);
+
+    pfingstmontag.setDate(
+        easter.getDate()+50
+    );
+
+    let bussbettag =
+    new Date(year,10,23,12,0,0);
+
+    while(
+        bussbettag.getDay() !== 3
+    ){
+
+        bussbettag.setDate(
+            bussbettag.getDate()-1
+        );
+
+    }
+
+    return [
+
+        `${year}-01-01`,
+        formatDate(karfreitag),
+        formatDate(ostermontag),
+        `${year}-05-01`,
+        formatDate(himmelfahrt),
+        formatDate(pfingstmontag),
+        `${year}-10-03`,
+        formatDate(bussbettag),
+        `${year}-12-25`,
+        `${year}-12-26`
+
+    ];
+
+}
+
+/* =========================
+FERIEN
+========================= */
+
+function getFerienSachsen(year){
+
+    const daten = {
+
+        2026:[
+            ["2026-02-09","2026-02-21"],
+            ["2026-04-03","2026-04-10"],
+            ["2026-05-15","2026-05-15"],
+            ["2026-07-04","2026-08-14"],
+            ["2026-10-12","2026-10-24"],
+            ["2026-12-23","2027-01-02"]
+        ]
+
+    };
+
+    return daten[year] || [];
+
+}
+
+function getFerienBrandenburg(year){
+
+    const daten = {
+
+        2026:[
+            ["2026-02-02","2026-02-07"],
+            ["2026-03-30","2026-04-10"],
+            ["2026-05-15","2026-05-15"],
+            ["2026-07-09","2026-08-22"],
+            ["2026-10-19","2026-10-30"],
+            ["2026-12-23","2027-01-02"]
+        ]
+
+    };
+
+    return daten[year] || [];
+
+}
+
+/* =========================
+BETWEEN
+========================= */
+
+function isBetween(date,start,end){
+
+    const startDate =
+    parseLocalDate(start);
+
+    const endDate =
+    parseLocalDate(end);
+
+    return date >= startDate
+    &&
+    date <= endDate;
+
+}
+
+/* =========================
+CALENDAR
+========================= */
+
+function generateCalendar(){
+
+    const year =
+    parseInt(
+        document.getElementById("yearInput").value
+    );
+
+    const holidays =
+    getHolidays(year);
+
+    const calendar =
+    document.getElementById("calendar");
+
+    calendar.innerHTML = "";
+
+    monate.forEach((monat,index)=>{
+
+        const monthDiv =
+        document.createElement("div");
+
+        monthDiv.className =
+        "month";
+
+        const daysInMonth =
+        new Date(year,index+1,0,12,0,0).getDate();
+
+        monthDiv.innerHTML =
+        `<div class="month-title">${monat}</div>`;
+
+        const grid =
+        document.createElement("div");
+
+        grid.className =
+        "days";
+
+        grid.innerHTML +=
+        `<div class="cell label">Schichten</div>`;
+
+        for(let d=1; d<=31; d++){
+
+            if(d <= daysInMonth){
+
+                const datum =
+                new Date(year,index,d,12,0,0);
+
+                const iso =
+                formatDate(datum);
+
+                const wd =
+                datum.getDay();
+
+                let cls =
+                "cell day-header";
+
+                if(wd === 0){
+                    cls += " sunday";
+                }
+
+                if(
+                    holidays.includes(iso)
+                ){
+                    cls += " holiday";
+                }
+
+                grid.innerHTML += `
+                <div class="${cls}">
+                    <div>${wochentage[wd]}</div>
+                    <div class="day-number">${d}</div>
+                </div>
+                `;
+
+            }else{
+
+                grid.innerHTML +=
+                `<div class="cell"></div>`;
+
+            }
+
+        }
+
+        grid.innerHTML +=
+        `<div class="cell label">Schichten</div>`;
+
+        for(let d=1; d<=31; d++){
+
+            if(d <= daysInMonth){
+
+                const datum =
+                new Date(year,index,d,12,0,0);
+
+                const iso =
+                formatDate(datum);
+
+                const wd =
+                datum.getDay();
+
+                let cls = "cell";
+
+                if(wd === 0){
+                    cls += " sunday";
+                }
+
+                if(
+                    holidays.includes(iso)
+                ){
+                    cls += " holiday";
+                }
+
+                const cell =
+                document.createElement("div");
+
+                cell.className =
+                cls;
+
+                cell.dataset.date = iso;
+
+                /* Ferien Sachsen */
+
+                getFerienSachsen(year)
+                .forEach(f=>{
+
+                    if(
+                        isBetween(
+                            datum,
+                            f[0],
+                            f[1]
+                        )
+                    ){
+
+                        const fer =
+                        document.createElement("div");
+
+                        fer.className =
+                        "ferien-sachsen";
+
+                        cell.appendChild(fer);
+
+                    }
+
+                });
+
+                /* Ferien Brandenburg */
+
+                getFerienBrandenburg(year)
+                .forEach(f=>{
+
+                    if(
+                        isBetween(
+                            datum,
+                            f[0],
+                            f[1]
+                        )
+                    ){
+
+                        const fer =
+                        document.createElement("div");
+
+                        fer.className =
+                        "ferien-brandenburg";
+
+                        cell.appendChild(fer);
+
+                    }
+
+                });
+
+                cell.addEventListener("click", function(){
+
+                    setShift(this);
+
+                });
+
+                grid.appendChild(cell);
+
+            }else{
+
+                const empty =
+                document.createElement("div");
+
+                empty.className = "cell";
+
+                grid.appendChild(empty);
+
+            }
+
+        }
+
+        monthDiv.appendChild(grid);
+
+        calendar.appendChild(monthDiv);
+
+    });
+
+}
+
+/* =========================
+SET SHIFT
+========================= */
+
+function setShift(cell){
+
+    if(
+        !cell.dataset.date
+    ) return;
+
+    if(
+        currentShift === "ENTFERNEN"
+    ){
+
+        const shifts =
+        cell.querySelectorAll(".shift");
+
+        shifts.forEach(s=>s.remove());
+
+        saveCalendar();
+
+        return;
+
+    }
+
+    let color = "#444";
+
+    switch(currentShift){
+
+        case "24h":
+        color="#c98a00";
+        break;
+
+        case "12h Tag":
+        color="#0033ff";
+        break;
+
+        case "12h Nacht":
+        color="#ff0000";
+        break;
+
+        case "LST":
+        color="#ff00ff";
+        break;
+
+        case "U":
+        color="#00cc00";
+        break;
+
+        case "UU":
+        color="#009955";
+        break;
+
+        case "L":
+        color="#ff8800";
+        break;
+
+        case "K":
+        color="#d10000";
+        break;
+
+        case "BrW":
+        color="#6d5bd0";
+        break;
+
+        case "BrW/24h":
+        color="#f2a93b";
+        break;
+
+    }
+
+    const oldShift =
+    cell.querySelector(".shift");
+
+    if(oldShift){
+
+        oldShift.remove();
+
+    }
+
+    const shift =
+    document.createElement("div");
+
+    shift.className = "shift";
+
+    shift.style.background = color;
+
+    shift.innerText = currentShift;
+
+    cell.appendChild(shift);
+
+    saveCalendar();
+
+}
+
+/* =========================
+SAVE
+========================= */
+
+function saveCalendar(){
+
+    const data = [];
+
+    document.querySelectorAll("[data-date]")
+    .forEach(cell=>{
+
+        const shift =
+        cell.querySelector(".shift");
+
+        if(shift){
+
+            data.push({
+
+                date:
+                cell.dataset.date,
+
+                html:
+                shift.outerHTML
+
+            });
+
+        }
+
+    });
+
+    localStorage.setItem(
+        "schichtplan_data",
+        JSON.stringify(data)
+    );
+
+    localStorage.setItem(
+        "schichtplan_year",
+        document.getElementById(
+            "yearInput"
+        ).value
+    );
+
+}
+
+/* =========================
+LOAD
+========================= */
+
+function loadCalendar(){
+
+    const savedYear =
+    localStorage.getItem(
+        "schichtplan_year"
+    );
+
+    if(savedYear){
+
+        document.getElementById(
+            "yearInput"
+        ).value = savedYear;
+
+    }
+
+    generateCalendar();
+
+    const data =
+    JSON.parse(
+        localStorage.getItem(
+            "schichtplan_data"
+        )
+    );
+
+    if(!data) return;
+
+    document.querySelectorAll("[data-date]")
+    .forEach(cell=>{
+
+        const entry =
+        data.find(
+            d => d.date === cell.dataset.date
+        );
+
+        if(entry){
+
+            cell.innerHTML +=
+            entry.html;
+
+        }
+
+    });
+
+}
+
+/* =========================
+START
+========================= */
+
+loadCalendar();
+
+</script>
+
+</body>
+</html>
